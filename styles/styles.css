@@ -241,3 +241,29 @@ main .section {
 main .section.highlight {
   background-color: var(--highlight-background-color);
 }
+
+/* MS form */
+.ms-form .hide {
+  display: none;
+}
+
+/* Send mail */
+.send-mail-success-message {
+  display: none;
+}
+.send-mail-success-message.show {
+  display: block;
+}
+.email-input {
+  display: inline-block;
+  width: auto;
+}
+
+/* Form error style */
+.error label {
+  color: red;
+}
+
+input[type="text"].error {
+  border-color: red;
+}

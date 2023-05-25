@@ -1,0 +1,12 @@
+.glossary ul,
+.glossary li {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.glossary li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

@@ -107,6 +107,36 @@ async function generateEmailDownloadPdf(html, basePath, email, requestUrl, token
   }
 }
 
+async function generateGlobalEmail(basePath, email, requestUrl, token) {
+  try {
+    const response = await fetch(requestUrl, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+        'X-Config-Token': token,
+      },
+    });
+    if (response.ok) {
+      const data = await response.json();
+      const csrf = data.data.csrfToken;
+      const payload = {
+        email,
+        source_code: '',
+        base_path: basePath,
+        email_template: 'glossary_email',
+        csrfToken: csrf,
+      };
+
+      await sendEmailData(payload, requestUrl, token);
+    } else {
+      throw new Error('Something went wrong with the GET request');
+    }
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(error.message);
+  }
+}
+
 export async function handlePdfMicroService(formData) {
   const basePath = 'https://xeljanzcom.test.pfizerstatic.io/';
   const token = 'xeljanz_uat-QFYD-RA-pdf-config-download';
@@ -124,4 +154,11 @@ export async function handleEmailMicroService(email, formData) {
   const html = `${createDynamicHtml(formData)}`;
   generateEmailDownloadPdf(html, basePath, email, requestUrl, token);
   // await generateDownloadPdf(html, basePath, requestUrl, token);
+}
+
+export async function handleEmailMicroServiceGlobal(email) {
+  const basePath = 'https://xeljanzcom.test.pfizerstatic.io/';
+  const token = 'ra_xeljanz_glossary_email';
+  const requestUrl = 'https://ms-forms-service-uat.digitalpfizer.com/api/v2/forms';
+  generateGlobalEmail(basePath, email, requestUrl, token);
 }

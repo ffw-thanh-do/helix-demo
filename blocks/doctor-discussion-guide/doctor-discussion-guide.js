@@ -1,9 +1,34 @@
 import { fetchPlaceholders } from '../../scripts/lib-franklin.js';
-import { handlePdfMicroService, handleEmailMicroService } from './micro-service-handlers.js';
-import { validateEmail } from '../../scripts/utility-functions.js';
+import { toggleMailMessage, validateEmailProcess } from '../../scripts/scripts.js';
+import { handlePdfMicroService, handleEmailMicroService } from '../../scripts/micro-service-handlers.js';
 
 const placeholders = await fetchPlaceholders();
 let formData = [];
+
+/**
+ * Build micro service form.
+ * @param {HTMLElement} element
+ */
+function generateMicroServiceForm(element) {
+  const html = `
+    <div>
+      <p class='no-check-error-message'>${placeholders.discussionguideemailerrormessage}</p>
+      <button id='pdfButton' class='pdf-button'>
+          ${placeholders.discussionguidepdfbutton}
+      </button>
+      <form class='ms-form'>
+        <div>
+          <input class='email-input' type='text' placeholder='${placeholders.discussionguideemailplaceholder}'>
+          <button class='email-button' type='submit'>
+            ${placeholders.discussionguideemailbutton}
+          </button>
+        </div>
+        <span class="send-mail-success-message">${placeholders.emailsuccessmessage}</span>
+      </form>
+    </div>
+  `;
+  element.insertAdjacentHTML('afterend', html);
+}
 
 /**
  * Updated form data function.
@@ -22,36 +47,14 @@ function updateFormData(formsWrapper) {
 }
 
 /**
- * Build micro service form.
- * @param {HTMLElement} element
- */
-function generateMicroServiceForm(element) {
-  const html = `
-    <div>
-      <p class='no-check-error-message'>${placeholders.discussionguideemailerrormessage}</p>
-      <button id='pdfButton' class='pdf-button'>
-          ${placeholders.discussionguidepdfbutton}
-      </button>
-      <form class='ms-form'>
-        <input id='emailInput' type='text' placeholder='${placeholders.discussionguideemailplaceholder}'>
-        <button id='emailButton' type='submit'>
-          ${placeholders.discussionguideemailbutton}
-        </button>
-      </form>
-    </div>
-  `;
-  element.insertAdjacentHTML('afterend', html);
-}
-
-/**
  * Convert list item to checkbox form element.
  *
- * @param {HTMLLIElement[]} itemsArray
+ * @param {HTMLLIElement[]} list
  * @param {HTMLFormElement} form
  * @param {Number} slideIndex
  */
-function generateCheckboxForm(itemsArray, form, slideIndex) {
-  itemsArray.forEach((item, index) => {
+function generateCheckboxForm(list, form, slideIndex) {
+  [...list.children].forEach((item, index) => {
     const html = `
       <div class='form-item'>
         <input type='checkbox' id='field${index}slide${slideIndex}' name='field${index}' value='${item.innerHTML}'>
@@ -69,12 +72,13 @@ function generateCheckboxForm(itemsArray, form, slideIndex) {
 function renderContainer(container) {
   const list = container.querySelector('ul');
   if (list) {
+    // Create form.
     const form = document.createElement('form');
     form.classList.add('data-form');
-    const items = list.querySelectorAll('li');
-    const itemsArray = Array.from(items);
+    generateCheckboxForm(list, form, 0);
+
+    // Replace form.
     list.replaceWith(form);
-    generateCheckboxForm(itemsArray, form, 0);
 
     // Build form service.
     generateMicroServiceForm(container);
@@ -117,6 +121,8 @@ function updateCheckboxes(element, block) {
 
   processErrorStatus(block, false);
 
+  toggleMailMessage(block, false);
+
   if (element.checked) {
     parentLabel.classList.add('checked');
   } else {
@@ -150,19 +156,21 @@ export default async function decorate(block) {
     }
   });
 
-  const emailButton = block.querySelector('#emailButton');
-  const emailInput = block.querySelector('#emailInput');
+  const emailButton = block.querySelector('.email-button');
+  const emailInput = block.querySelector('.email-input');
   emailButton.addEventListener('click', async (event) => {
     event.preventDefault();
-    const email = emailInput.value;
-    if (!validateEmail(email) || email.length === 0 || email.length >= 120) {
-      emailInput.classList.add('error');
+    const result = validateEmailProcess(emailInput);
+
+    if (!result) {
       return;
     }
-    emailInput.classList.remove('error');
 
     if (formData.length) {
-      await handleEmailMicroService(email, formData, placeholders, event.target);
+      await handleEmailMicroService(emailInput.value, formData, placeholders, event.target);
+
+      // Show mail success message.
+      toggleMailMessage(block);
     } else {
       processErrorStatus(block);
     }
