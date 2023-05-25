@@ -1,5 +1,6 @@
 import { fetchPlaceholders } from '../../scripts/lib-franklin.js';
-import { handlePdfMicroService } from './micro-service-handlers.js';
+import { handlePdfMicroService, handleEmailMicroService } from './micro-service-handlers.js';
+import { validateEmail } from '../../scripts/utility-functions.js';
 
 const placeholders = await fetchPlaceholders();
 let formData = [];
@@ -147,5 +148,28 @@ export default async function decorate(block) {
     } else {
       processErrorStatus(block);
     }
+  });
+
+  const emailButton = block.querySelector('#emailButton');
+  const emailInput = block.querySelector('#emailInput');
+  emailButton.addEventListener('click', async (event) => {
+    event.preventDefault();
+    const email = emailInput.value;
+    if (!validateEmail(email) || email.length === 0 || email.length >= 120) {
+      emailInput.classList.add('error');
+      return;
+    }
+    emailInput.classList.remove('error');
+
+    if (formData.length) {
+      await handleEmailMicroService(email, formData, placeholders, event.target);
+    } else {
+      processErrorStatus(block);
+    }
+  });
+
+  emailButton.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    await handlePdfMicroService(formData, placeholders);
   });
 }

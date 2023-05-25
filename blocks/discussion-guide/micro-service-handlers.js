@@ -90,10 +90,13 @@ async function generateEmailDownloadPdf(html, basePath, email, requestUrl, token
       const csrf = data.data.csrfToken;
       const payload = {
         csrfToken: csrf,
-        input: email,
+        email,
         dynamic_html: html,
         base_path: basePath,
+        type: 'mail',
+        email_template: 'glossary_email',
       };
+
       await sendEmailData(payload, requestUrl, token);
     } else {
       throw new Error('Something went wrong with the GET request');
@@ -113,12 +116,12 @@ export async function handlePdfMicroService(formData) {
   await generateDownloadPdf(html, basePath, requestUrl, token);
 }
 
-export async function handleEmailMicroService(email, formData, placeholders) {
-  const basePath = `${window.location.protocol}//${window.location.host}/`;
-  const token = placeholders.emailConfigToken;
-  const requestUrl = placeholders.emailMicroServiceUrl;
+export async function handleEmailMicroService(email, formData) {
+  const basePath = 'https://xeljanzcom.test.pfizerstatic.io/';
+  const token = 'xeljanz_uat-QFYD-RA-pdf-config';
+  const requestUrl = 'https://ms-forms-service-uat.digitalpfizer.com/api/v2/forms';
   createDynamicHtml(formData);
-  const html = `<tbody>${createDynamicHtml(formData)}</tbody>`;
+  const html = `${createDynamicHtml(formData)}`;
   generateEmailDownloadPdf(html, basePath, email, requestUrl, token);
   // await generateDownloadPdf(html, basePath, requestUrl, token);
 }
