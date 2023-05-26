@@ -1,5 +1,5 @@
 import { fetchPlaceholders } from '../../scripts/lib-franklin.js';
-import { toggleMailMessage, validateEmailProcess } from '../../scripts/scripts.js';
+import { toggleMailMessage, validateEmailProcess } from '../../scripts/utility-functions.js';
 import { handleEmailMicroServiceGlobal } from '../../scripts/micro-service-handlers.js';
 
 const placeholders = await fetchPlaceholders();

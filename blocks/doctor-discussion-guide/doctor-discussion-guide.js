@@ -1,5 +1,5 @@
 import { fetchPlaceholders } from '../../scripts/lib-franklin.js';
-import { toggleMailMessage, validateEmailProcess } from '../../scripts/scripts.js';
+import { toggleMailMessage, validateEmailProcess } from '../../scripts/utility-functions.js';
 import { handlePdfMicroService, handleEmailMicroService } from '../../scripts/micro-service-handlers.js';
 
 const placeholders = await fetchPlaceholders();
@@ -13,7 +13,7 @@ function generateMicroServiceForm(element) {
   const html = `
     <div>
       <p class='no-check-error-message'>${placeholders.discussionguideemailerrormessage}</p>
-      <button id='pdfButton' class='pdf-button'>
+      <button class='pdf-button'>
           ${placeholders.discussionguidepdfbutton}
       </button>
       <form class='ms-form'>
@@ -47,18 +47,31 @@ function updateFormData(formsWrapper) {
 }
 
 /**
+ * Random number with range.
+ *
+ * @param {number} min
+ * @param {number} max
+ * @return {number}
+ */
+function randomNumberRange(min, max) {
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
+/**
  * Convert list item to checkbox form element.
  *
  * @param {HTMLLIElement[]} list
  * @param {HTMLFormElement} form
  * @param {Number} slideIndex
  */
-function generateCheckboxForm(list, form, slideIndex) {
+function generateCheckboxForm(list, form) {
+  const number = randomNumberRange(1, 1000);
+
   [...list.children].forEach((item, index) => {
     const html = `
       <div class='form-item'>
-        <input type='checkbox' id='field${index}slide${slideIndex}' name='field${index}' value='${item.innerHTML}'>
-        <label for='field${index}slide${slideIndex}'>${item.innerHTML}</label>
+        <input type='checkbox' id='field-${index}-slide-${number}' name='field-${index}-slide-${number}' value='${item.innerHTML}'>
+        <label for='field-${index}-slide-${number}'>${item.innerHTML}</label>
       </div>`;
     form.insertAdjacentHTML('beforeend', html);
   });
@@ -75,7 +88,7 @@ function renderContainer(container) {
     // Create form.
     const form = document.createElement('form');
     form.classList.add('data-form');
-    generateCheckboxForm(list, form, 0);
+    generateCheckboxForm(list, form);
 
     // Replace form.
     list.replaceWith(form);

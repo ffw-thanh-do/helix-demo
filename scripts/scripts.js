@@ -13,54 +13,7 @@ import {
   loadCSS,
 } from './lib-franklin.js';
 
-import {
-  validateEmail,
-} from './utility-functions.js';
-
 const LCP_BLOCKS = []; // add your LCP blocks to the list
-
-/**
- * Toggle mail message display.
- *
- * @param {Element} block
- * @param {Boolean} isShow
- */
-export function toggleMailMessage(block, isShow = true) {
-  const mailSuccessMessage = block.querySelector('.send-mail-success-message');
-  const mailMessageSibling = mailSuccessMessage.parentElement.querySelector('div');
-  const hideFlag = 'hide';
-  const showFlag = 'show';
-
-  if (isShow) {
-    mailMessageSibling.classList.add(hideFlag);
-    mailSuccessMessage.classList.add(showFlag);
-  } else {
-    mailMessageSibling.classList.remove(hideFlag);
-    mailSuccessMessage.classList.remove(showFlag);
-  }
-}
-
-/**
- * Validate Email Process.
- *
- * @param {Element} emailInput
- *
- * @return {boolean}
- */
-export function validateEmailProcess(emailInput) {
-  const errorFlag = 'error';
-  const email = emailInput.value;
-  let pass = false;
-
-  if (!validateEmail(email) || email.length === 0 || email.length >= 120) {
-    emailInput.classList.add(errorFlag);
-  } else {
-    emailInput.classList.remove(errorFlag);
-    pass = true;
-  }
-
-  return pass;
-}
 
 /**
  * Builds hero block and prepends to main in a new section.
