@@ -14,6 +14,7 @@ import {
 } from './lib-franklin.js';
 
 const LCP_BLOCKS = []; // add your LCP blocks to the list
+window.hlx.RUM_GENERATION = 'project-1'; // add your RUM generation information here
 
 /**
  * Builds hero block and prepends to main in a new section.
@@ -122,6 +123,17 @@ function loadDelayed() {
 }
 
 async function loadPage() {
+  // handle 404 from document
+  if (window.errorCode === '404') {
+    const resp = await fetch('/global/404.plain.html');
+    if (resp.status === 200) {
+      const html = await resp.text();
+      const main = document.querySelector('main');
+      main.innerHTML = html;
+      main.classList.remove('error');
+    }
+  }
+
   await loadEager(document);
   await loadLazy(document);
   loadDelayed();

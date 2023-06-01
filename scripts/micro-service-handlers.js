@@ -162,3 +162,41 @@ export async function handleEmailMicroServiceGlobal(email) {
   const requestUrl = 'https://ms-forms-service-uat.digitalpfizer.com/api/v2/forms';
   generateGlobalEmail(basePath, email, requestUrl, token);
 }
+
+export async function testSend(payload, token) {
+  const requestUrl = 'https://ms-forms-service-uat.digitalpfizer.com/api/v2/forms';
+
+  try {
+    let errorsList = [];
+    await fetch(requestUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Config-Token': token,
+      },
+      body: JSON.stringify(payload),
+    })
+      .then((res) => res.json())
+      .then((object) => {
+        if (object.errors) {
+          console.log('object.errors', object.errors[0].detailObj);
+          errorsList = object.errors[0]?.detailObj;
+          throw new Error(object.errors);
+        }
+        console.log('succeed json re');
+        // dispatch(update_user(json));
+      });
+    // if (response.ok) {
+    //   // eslint-disable-next-line no-console
+    //   console.log('Email sent successfully');
+    // } else {
+    //   throw new Error('Something went wrong! Please try again.');
+    // }
+    return errorsList;
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(error.message);
+  }
+
+  return [];
+}
