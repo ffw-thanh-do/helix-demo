@@ -1,0 +1,26 @@
+.symptom-tracker-survey .ms-actions {
+  display: none;
+}
+
+.symptom-tracker-survey-step {
+  display: none;
+}
+
+.symptom-tracker-survey-step.is-active {
+  display: block;
+}
+
+.symptom-tracker-survey.is-finished .ms-actions,
+.symptom-tracker-survey.is-finished .symptom-tracker-survey-step {
+  display: block;
+}
+
+.symptom-tracker-survey.is-finished .pagination,
+.symptom-tracker-survey.is-finished .symptom-tracker-survey-step.is-invisible,
+.symptom-tracker-survey.is-finished .symptom-tracker-survey-step .form-item {
+  display: none;
+}
+
+.symptom-tracker-survey.is-finished .symptom-tracker-survey-step .form-item.checked {
+  display: block;
+}
